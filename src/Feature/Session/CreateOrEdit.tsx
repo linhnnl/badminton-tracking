@@ -3,7 +3,6 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
-    DialogTitle,
     Button,
     Tabs,
     Tab,
@@ -52,9 +51,6 @@ export default function CreateOrEdit({ session, onClose }: Props) {
                 },
             }}
         >
-            <DialogTitle sx={{ fontWeight: 700 }}>
-                {isEdit ? 'Thông tin buổi chơi' : 'Thêm buổi chơi'}
-            </DialogTitle>
 
             <Box sx={{ borderBottom: '1px solid #e5e7eb' }}>
                 <Tabs
@@ -66,6 +62,7 @@ export default function CreateOrEdit({ session, onClose }: Props) {
                             textTransform: 'none',
                             fontWeight: 600,
                         },
+                        mt: 2
                     }}
                 >
                     <Tab label="Thông tin" />

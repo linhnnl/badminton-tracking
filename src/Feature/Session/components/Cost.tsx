@@ -4,6 +4,12 @@ import {
     Button,
     IconButton,
     Stack,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
     TextField,
     Typography,
 } from '@mui/material';
@@ -65,6 +71,31 @@ const variableCostItems: CostItem[] = [
 function formatCurrency(amount: number) {
     return `${amount.toLocaleString('vi-VN')} đ`;
 }
+
+const costTableHeadCellSx = {
+    fontWeight: 700,
+    fontSize: 16,
+    bgcolor: '#f1f5f9',
+    borderBottom: '1px solid #e5e7eb',
+} as const;
+
+const costTableSx = {
+    tableLayout: 'fixed',
+    width: '100%',
+    '& .MuiTableCell-root': {
+        px: 2,
+        py: 1.25,
+        textAlign: 'center',
+        verticalAlign: 'middle',
+    },
+} as const;
+
+const costActionCellSx = {
+    width: 48,
+    maxWidth: 48,
+    minWidth: 48,
+    px: 0.5,
+} as const;
 
 function createEmptyItem(items: CostItem[]): CostItem {
     const nextId =
@@ -201,106 +232,129 @@ function CostSection({ title, items, onItemsChange }: CostSectionProps) {
                 </Button>
             </Stack>
 
-            <Box
+            <TableContainer
                 sx={{
                     border: '1px solid #e5e7eb',
                     borderRadius: 2,
-                    overflow: 'hidden',
                 }}
             >
-                <Box
-                    display="grid"
-                    gridTemplateColumns="1.4fr 1fr 1.4fr 2fr 48px"
-                    sx={{
-                        bgcolor: '#f1f5f9',
-                        px: 2,
-                        py: 1,
-                        fontWeight: 700,
-                        fontSize: 13,
-                    }}
-                >
-                    <Box>Danh mục</Box>
-                    <Box>Đơn giá</Box>
-                    <Box>Người thanh toán</Box>
-                    <Box>Ghi chú</Box>
-                    <Box />
-                </Box>
+                <Table size="small" sx={costTableSx}>
+                    <colgroup>
+                        <col />
+                        <col />
+                        <col />
+                        <col />
+                        <col style={{ width: 80 }} />
+                    </colgroup>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell align="center" sx={costTableHeadCellSx}>
+                                Danh mục
+                            </TableCell>
+                            <TableCell align="center" sx={costTableHeadCellSx}>
+                                Đơn giá
+                            </TableCell>
+                            <TableCell align="center" sx={costTableHeadCellSx}>
+                                Người thanh toán
+                            </TableCell>
+                            <TableCell align="center" sx={costTableHeadCellSx}>
+                                Ghi chú
+                            </TableCell>
+                            <TableCell
+                                align="center"
+                                sx={{ ...costTableHeadCellSx, ...costActionCellSx }}
+                            />
+                        </TableRow>
+                    </TableHead>
 
-                {items.map((item) => (
-                    <Box
-                        key={item.id}
-                        display="grid"
-                        gridTemplateColumns="1.4fr 1fr 1.4fr 2fr 48px"
-                        gap={1.5}
-                        alignItems="center"
-                        sx={{
-                            px: 2,
-                            py: 1.5,
-                            borderTop: '1px solid #e5e7eb',
-                        }}
-                    >
-                        <TextField
-                            size="small"
-                            placeholder="Danh mục"
-                            value={item.category}
-                            onChange={(e) =>
-                                updateItem(item.id, {
-                                    category: e.target.value,
-                                })
-                            }
-                        />
-                        <TextField
-                            size="small"
-                            placeholder="Đơn giá"
-                            value={
-                                item.unitPrice
-                                    ? item.unitPrice.toLocaleString('vi-VN')
-                                    : ''
-                            }
-                            onChange={(e) => {
-                                const raw = e.target.value.replace(/\D/g, '');
-                                updateItem(item.id, {
-                                    unitPrice: raw ? Number(raw) : 0,
-                                });
-                            }}
-                        />
-                        <Autocomplete
-                            fullWidth
-                            options={memberOptions}
-                            value={item.payer}
-                            onChange={(_, value) =>
-                                updateItem(item.id, { payer: value })
-                            }
-                            getOptionLabel={(option) => option.name}
-                            isOptionEqualToValue={(option, value) =>
-                                option.id === value.id
-                            }
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    size="small"
-                                    placeholder="Tìm theo tên"
-                                />
-                            )}
-                        />
-                        <TextField
-                            size="small"
-                            value={item.note}
-                            onChange={(e) =>
-                                updateItem(item.id, { note: e.target.value })
-                            }
-                        />
-
-                        <IconButton
-                            size="small"
-                            color="error"
-                            onClick={() => removeItem(item.id)}
-                        >
-                            <DeleteOutlineIcon fontSize="small" />
-                        </IconButton>
-                    </Box>
-                ))}
-            </Box>
+                    <TableBody>
+                        {items.map((item) => (
+                            <TableRow key={item.id} hover>
+                                <TableCell align="center">
+                                    <TextField
+                                        fullWidth
+                                        size="small"
+                                        placeholder="Danh mục"
+                                        value={item.category}
+                                        onChange={(e) =>
+                                            updateItem(item.id, {
+                                                category: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </TableCell>
+                                <TableCell align="center">
+                                    <TextField
+                                        fullWidth
+                                        size="small"
+                                        placeholder="Đơn giá"
+                                        value={
+                                            item.unitPrice
+                                                ? item.unitPrice.toLocaleString(
+                                                      'vi-VN',
+                                                  )
+                                                : ''
+                                        }
+                                        onChange={(e) => {
+                                            const raw = e.target.value.replace(
+                                                /\D/g,
+                                                '',
+                                            );
+                                            updateItem(item.id, {
+                                                unitPrice: raw
+                                                    ? Number(raw)
+                                                    : 0,
+                                            });
+                                        }}
+                                    />
+                                </TableCell>
+                                <TableCell align="center">
+                                    <Autocomplete
+                                        fullWidth
+                                        options={memberOptions}
+                                        value={item.payer}
+                                        onChange={(_, value) =>
+                                            updateItem(item.id, { payer: value })
+                                        }
+                                        getOptionLabel={(option) => option.name}
+                                        isOptionEqualToValue={(option, value) =>
+                                            option.id === value.id
+                                        }
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                size="small"
+                                                placeholder="Tìm theo tên"
+                                            />
+                                        )}
+                                    />
+                                </TableCell>
+                                <TableCell align="center">
+                                    <TextField
+                                        fullWidth
+                                        size="small"
+                                        value={item.note}
+                                        onChange={(e) =>
+                                            updateItem(item.id, {
+                                                note: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </TableCell>
+                                <TableCell align="center" sx={costActionCellSx}>
+                                    <IconButton
+                                        size="small"
+                                        color="error"
+                                        onClick={() => removeItem(item.id)}
+                                    >
+                                        <DeleteOutlineIcon fontSize="small" />
+                                    </IconButton>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
         </Box>
     );
 }

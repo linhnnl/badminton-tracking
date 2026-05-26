@@ -4,11 +4,16 @@ import {
     Button,
     Checkbox,
     FormControl,
-    IconButton,
     InputLabel,
     MenuItem,
     Select,
     Stack,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
     TextField,
     Typography,
 } from '@mui/material';
@@ -61,7 +66,22 @@ export const memberOptions: MemberOption[] = [
     },
 ];
 
+const memberTableHeadCellSx = {
+    fontWeight: 700,
+    fontSize: 13,
+    bgcolor: '#f1f5f9',
+    borderBottom: '1px solid #e5e7eb',
+} as const;
 
+const memberTableSx = {
+    tableLayout: 'fixed',
+    width: '100%',
+    '& .MuiTableCell-root': {
+        px: 2,
+        py: 1.25,
+        textAlign: 'center',
+    },
+} as const;
 
 export default function Information({ formData }: Props) {
     //const selectedCount = formData.members.filter((m) => m.checked).length;
@@ -190,69 +210,75 @@ export default function Information({ formData }: Props) {
 
                 </Stack>
 
-                <Box
+                <TableContainer
                     sx={{
                         border: '1px solid #e5e7eb',
                         borderRadius: 2,
-                        overflow: 'hidden',
                     }}
                 >
-                    <Box
-                        display="grid"
-                        gridTemplateColumns="2fr 1fr 1fr 1fr 1fr"
-                        sx={{
-                            bgcolor: '#f1f5f9',
-                            px: 2,
-                            py: 1,
-                            fontSize: 13,
-                            fontWeight: 700,
-                        }}
-                    >
-                        <Box>Họ và tên</Box>
-                        <Box>Chi phí cố định</Box>
-                        <Box>Tham gia</Box>
-                        <Box>Chi phí khác</Box>
-                        <Box>Trạng thái</Box>
-                    </Box>
+                    <Table size="small" sx={memberTableSx}>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell align="center" sx={memberTableHeadCellSx}>
+                                    Họ và tên
+                                </TableCell>
+                                <TableCell align="center" sx={memberTableHeadCellSx}>
+                                    Chi phí cố định
+                                </TableCell>
+                                <TableCell align="center" sx={memberTableHeadCellSx}>
+                                    Tham gia
+                                </TableCell>
+                                <TableCell align="center" sx={memberTableHeadCellSx}>
+                                    Chi phí khác
+                                </TableCell>
+                                <TableCell align="center" sx={memberTableHeadCellSx}>
+                                    Trạng thái
+                                </TableCell>
+                            </TableRow>
+                        </TableHead>
 
-                    {formData.members.map((member) => (
-                        <Box
-                            key={member.id}
-                            display="grid"
-                            gridTemplateColumns="2fr 1fr 1fr 1fr 1fr"
-                            alignItems="center"
-                            sx={{
-                                px: 2,
-                                py: 1.2,
-                                borderTop: '1px solid #e5e7eb',
-                                '&:hover': {
-                                    bgcolor: '#f8fafc',
-                                },
-                            }}
-                        >
-                            <Typography fontSize={14}>
-                                {member.name}
-                            </Typography>
-
-                            <Typography fontSize={14}>
-                                500,000 đ
-                            </Typography>
-
-                            <Checkbox checked={member.checked} size="small"/>
-
-                            <Typography fontSize={14}>
-                                0 đ
-                            </Typography>
-                            <FormControl fullWidth size="small">
-                                <Select>
-                                    <MenuItem value="Done">Đã thanh toán</MenuItem>
-                                    <MenuItem value="Not">Chưa thanh toán</MenuItem>
-                                </Select>
-                            </FormControl>
-                            
-                        </Box>
-                    ))}
-                </Box>
+                        <TableBody>
+                            {formData.members.map((member) => (
+                                <TableRow key={member.id} hover>
+                                    <TableCell align="center" >
+                                        {member.name}
+                                    </TableCell>
+                                    <TableCell align="center" >
+                                        500,000 đ
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <Checkbox
+                                            checked={member.checked}
+                                            size="small"
+                                            sx={{ p: 0.5 }}
+                                        />
+                                    </TableCell>
+                                    <TableCell align="center" >
+                                        0 đ
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <FormControl fullWidth size="small">
+                                            <Select
+                                                sx={{
+                                                    '& .MuiSelect-select': {
+                                                        textAlign: 'center',
+                                                    },
+                                                }}
+                                            >
+                                                <MenuItem value="Done">
+                                                    Đã thanh toán
+                                                </MenuItem>
+                                                <MenuItem value="Not">
+                                                    Chưa thanh toán
+                                                </MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
 
             </Box>
 
