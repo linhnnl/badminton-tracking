@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import CreateOrEdit from './CreateOrEdit';
-import SessionTable from './components/SessionTable';
 
-export type PaymentType = 'Monthly' | 'Single'|'No';
+import CommonTable, { renderChip } from '../../Component/CommonTable.tsx';
+import type { Column, TableAction } from '../../Component/CommonTable.tsx';
+import CreateOrEdit from './CreateOrEdit';
+
+export type PaymentType = 'Monthly' | 'Single' | 'No';
 
 export type Member = {
     id: number;
@@ -47,6 +49,29 @@ const fakeSessions: Session[] = [
     },
 ];
 
+const columns: Column<Session>[] = [
+    { field: 'id', headerName: 'ID' },
+    { field: 'date', headerName: 'Ngày' },
+    { field: 'court', headerName: 'Sân' },
+    {
+        field: 'paymentType',
+        headerName: 'Loại thanh toán',
+        render: renderChip<Session>('paymentType', {
+            getLabel: (value) => String(value),
+            getClassName: (value) =>
+                value === 'Monthly'
+                    ? 'custom-chip-primary'
+                    : 'custom-chip-warning',
+        }),
+    },
+    { field: 'payer', headerName: 'Người thanh toán' },
+    {
+        field: 'members',
+        headerName: 'Số người',
+        render: (row) => row.members.filter((m) => m.checked).length,
+    },
+];
+
 export default function Container() {
     const [sessions] = useState<Session[]>(fakeSessions);
     const [selectedSession, setSelectedSession] = useState<Session | null>(null);
@@ -67,6 +92,13 @@ export default function Container() {
         setSelectedSession(null);
     };
 
+    const actions: TableAction<Session>[] = [
+        {
+            label: 'Chi tiết',
+            onClick: handleEdit,
+        },
+    ];
+
     return (
         <div>
             <div className="page-header">
@@ -76,10 +108,7 @@ export default function Container() {
                 </button>
             </div>
 
-            <SessionTable
-                sessions={sessions}
-                onEdit={handleEdit}
-            />
+            <CommonTable columns={columns} rows={sessions} actions={actions} />
 
             {openModal && (
                 <CreateOrEdit

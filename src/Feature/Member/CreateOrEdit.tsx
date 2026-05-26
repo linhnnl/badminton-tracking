@@ -1,151 +1,142 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 import {
-  Drawer,
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Divider,
-  MenuItem,
-} from "@mui/material";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import type { Member } from "../../types";
+    Box,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    MenuItem,
+    TextField,
+    Typography,
+} from '@mui/material';
 
-const StatusOption = [
-  { id: 'active', name: "Active" },
-  { id: 'inactive', name: "Inactive" },
-]
+import type { Member } from '../../types';
 
-// type Product = {
-//   id?: number
-//   name?: string
-//   price?: number
-//   description?: string
-//   status?: number
-// }
-
-function CreateOrEdit (){
-    const [form, setForm] = useState<Member>();
-    const { id } = useParams<{ id: string }>();
-    
-    const navigate = useNavigate();
-    const location = useLocation()
-    
-    const isOpen = location.pathname.includes("create") || Boolean(id);
-    const closeDrawer = () => {
-      navigate("/members");
-    };
-
-    useEffect(() => {
-      if (!id) {
-        setForm({ id: 0, name: "", status: 'active' } as Member);
-        return;
-      }
-      (async () => {
-        try {
-          //const res = await axios.get(`/api/members/${id}`);
-          const mockData = 
-            { id: 1, name: "John Doe", status: 'active' }
-          setForm(mockData as Member);
-          //setForm(res.data);
-        } catch {
-          setForm({ id: 0, name: '', status: 'active' } as Member);
-        }
-      })();
-      return;
-    }, [id]);
-
-    // const handleChange = (field: string, value: any) => {
-    //   setForm((prev) => ({
-    //     ...prev,
-    //     [field]: value,
-    //   }));
-    // };
-
-    const handleSubmit = async () => {
-      if (!form) return;
-      const payload = {
-        name: form.name ?? "",
-        // price: form.price ?? 0,
-        // description: form.description ?? "",
-        // status: form.status ?? 0,
-      };
-      try {
-        if (id) {
-          await axios.put(`/api/members/${id}`, payload);
-        } else {
-          await axios.post("/api/members", payload);
-        }
-        closeDrawer();
-      } catch {
-        // API error: giữ drawer mở để user sửa / thử lại
-      }
-    };
-  return (
-    <Drawer anchor="right" open={isOpen} onClose={closeDrawer}>
-      <Box sx={{ width: 400, p: 3 }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>
-          {id ? "Edit Product" : "Create Product"}
-        </Typography>
-
-        <Divider sx={{ mb: 2 }} />
-
-        <TextField
-          label="Name"
-          name="name"
-          fullWidth
-          margin="normal"
-          value={form?.name}
-          variant="standard"
-          //onChange={(e) => handleChange("name", e.target.value)}
-        />
-        {/* <TextField
-          label="Price"
-          name="price"
-          type="number"
-          fullWidth
-          margin="normal"
-          value={form?.price}
-          variant="standard"
-          onChange={(e) => handleChange("price", Number(e.target.value))}
-        /> */}
-        {/* <TextField
-          label="Description"
-          name="description"
-          fullWidth
-          margin="normal"
-          value={form?.description}
-          variant="standard"
-          onChange={(e) => handleChange("description", e.target.value)}
-        /> */}
-        <TextField
-          select
-          label="Status"
-          value={form?.status ?? ""}
-          //onChange={(e) => handleChange("status", Number(e.target.value))}
-          fullWidth
-          margin="normal"
-          variant="standard"
-        >
-          {StatusOption.map((s) => (
-            <MenuItem key={s.id} value={s.id}>
-              {s.name}
-            </MenuItem>
-          ))}
-        </TextField>
-
-        <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
-          <Button onClick={closeDrawer} sx={{ mr: 1 }}>
-            Cancel
-          </Button>
-          <Button variant="contained" onClick={handleSubmit} >
-            {id ? "Save" : "Create"}
-          </Button>
-        </Box>
-      </Box>
-    </Drawer>
-  );
+type Props = {
+    member: Member | null;
+    onClose: () => void;
 };
 
-export default CreateOrEdit;
+const defaultMember: Member = {
+    id: 0,
+    name: '',
+    status: 'active',
+};
+
+const statusOptions = [
+    { id: 'active', name: 'Active' },
+    { id: 'inactive', name: 'Inactive' },
+] as const;
+
+export default function CreateOrEdit({ member, onClose }: Props) {
+    const isEdit = Boolean(member);
+    const [form, setForm] = useState<Member>(member ?? defaultMember);
+
+    useEffect(() => {
+        setForm(member ?? defaultMember);
+    }, [member]);
+
+    const handleChange = <K extends keyof Member>(field: K, value: Member[K]) => {
+        setForm((prev) => ({
+            ...prev,
+            [field]: value,
+        }));
+    };
+
+    const handleSubmit = async () => {
+        const payload = {
+            name: form.name,
+            status: form.status,
+        };
+
+        try {
+            if (isEdit && member) {
+                await axios.put(`/api/members/${member.id}`, payload);
+            } else {
+                await axios.post('/api/members', payload);
+            }
+            onClose();
+        } catch {
+            // API error: giữ modal mở để user thử lại
+        }
+    };
+
+    return (
+        <Dialog
+            open
+            onClose={onClose}
+            fullWidth
+            maxWidth="sm"
+            PaperProps={{
+                sx: {
+                    borderRadius: 4,
+                    overflow: 'hidden',
+                },
+            }}
+        >
+            <Box sx={{ px: 3, pt: 3, pb: 1 }}>
+                <Typography variant="h6" fontWeight={700}>
+                    {isEdit ? 'Chi tiết thành viên' : 'Thêm thành viên'}
+                </Typography>
+            </Box>
+
+            <DialogContent
+                sx={{
+                    bgcolor: '#f8fafc',
+                    px: 3,
+                    py: 2,
+                }}
+            >
+                <Box
+                    sx={{
+                        bgcolor: '#fff',
+                        borderRadius: 3,
+                        p: 3,
+                        border: '1px solid #e5e7eb',
+                    }}
+                >
+                    <TextField
+                        label="Tên"
+                        fullWidth
+                        size="small"
+                        margin="normal"
+                        value={form.name}
+                        onChange={(e) => handleChange('name', e.target.value)}
+                    />
+
+                    <TextField
+                        select
+                        label="Trạng thái"
+                        fullWidth
+                        size="small"
+                        margin="normal"
+                        value={form.status}
+                        onChange={(e) =>
+                            handleChange(
+                                'status',
+                                e.target.value as Member['status'],
+                            )
+                        }
+                    >
+                        {statusOptions.map((option) => (
+                            <MenuItem key={option.id} value={option.id}>
+                                {option.name}
+                            </MenuItem>
+                        ))}
+                    </TextField>
+                </Box>
+            </DialogContent>
+
+            <DialogActions sx={{ p: 2.5, borderTop: '1px solid #e5e7eb' }}>
+                <Button variant="outlined" onClick={onClose}>
+                    Hủy
+                </Button>
+
+                <Button variant="contained" onClick={handleSubmit}>
+                    {isEdit ? 'Lưu' : 'Tạo mới'}
+                </Button>
+            </DialogActions>
+        </Dialog>
+    );
+}

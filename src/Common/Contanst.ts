@@ -1,6 +1,6 @@
 const Constants = {
     CREATE_PATH: 'create',
-    EDIT_PATH: 'edit'
-}
+    EDIT_PATH: 'edit',
+};
 
-export default Constants
+export default Constants;

@@ -1,107 +1,74 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useState } from 'react';
 
-import {
-  Container,
-  Typography,
-  Button,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Paper
-} from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import Constants from "../../Common/Contanst";
-import type { Member } from "../../types";
+import CommonTable, { renderChip } from '../../Component/CommonTable.tsx';
+import type { Column, TableAction } from '../../Component/CommonTable.tsx';
+import type { Member } from '../../types';
+import CreateOrEdit from './CreateOrEdit';
 
-// interface Product {
-//   id: number;
-//   name: string;
-//   price: number;
-// }
+const fakeMembers: Member[] = [
+    { id: 1, name: 'Nguyễn Văn An', status: 'active' },
+    { id: 2, name: 'Trần Thị Bình', status: 'active' },
+    { id: 3, name: 'Lê Minh Cường', status: 'inactive' },
+    { id: 4, name: 'Phạm Thị Dung', status: 'active' },
+];
+
+const columns: Column<Member>[] = [
+    { field: 'id', headerName: 'ID'},
+    { field: 'name', headerName: 'Tên'},
+    {
+        field: 'status',
+        headerName: 'Trạng thái',
+        render: renderChip<Member>('status', {
+            getLabel: (value) => (value === 'active' ? 'Active' : 'Inactive'),
+            getClassName: (value) =>
+                value === 'active'
+                    ? 'custom-chip-primary'
+                    : 'custom-chip-warning',
+        }),
+    },
+];
 
 export default function MemberContainer() {
-  const [members, setMembers] = useState<Member[]>([]);
+    const [members] = useState<Member[]>(fakeMembers);
+    const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+    const [openModal, setOpenModal] = useState(false);
 
-  const loadMembers = async () => {
-    //const res = await axios.get("/api/members");
-    //const res = await axios.get("http://localhost:5203/api/products");
-    const mockData = [
-      { id: 1, name: "John Doe", status: 'active' },
-      { id: 2, name: "Jane Doe", status: 'inactive' },
-    ]
-    setMembers(mockData as Member[]);
-    //setMembers(res.data);
+    const handleCreate = () => {
+        setSelectedMember(null);
+        setOpenModal(true);
+    };
 
-  };
+    const handleEdit = (member: Member) => {
+        setSelectedMember(member);
+        setOpenModal(true);
+    };
 
-  useEffect(() => {
-    loadMembers();
-  }, []);
+    const handleClose = () => {
+        setOpenModal(false);
+        setSelectedMember(null);
+    };
 
-  const navigate = useNavigate();
-  const handleClear = (id: number) => {
-    const a = id
-    return a
-  }
+    const actions: TableAction<Member>[] = [
+        {
+            label: 'Chi tiết',
+            onClick: handleEdit,
+        },
+    ];
 
-  return (
-    <Container maxWidth="lg">
-      <Paper
-        elevation={3}
-        sx={{
-          p: 3,
-          borderRadius: 2,
-          bgcolor: "background.paper",
-        }}
-      >
-        <Typography variant="h4" sx={{ mb: 2 }}>
-          Member List
-        </Typography>
-        <Button variant="contained" sx={{ mb: 2 }} onClick={() => navigate(Constants.CREATE_PATH)}>
-          Add Member
-        </Button> 
+    return (
+        <div>
+            <div className="page-header">
+                <h2 className="page-title">List Member</h2>
+                <button className="btn btn-primary" onClick={handleCreate}>
+                    Add Member
+                </button>
+            </div>
 
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Price</TableCell>
-              <TableCell>Action</TableCell>
-            </TableRow>
-          </TableHead>
+            <CommonTable columns={columns} rows={members} actions={actions} />
 
-          <TableBody>
-            {members.map((p) => (
-              <TableRow 
-                key={p.id}
-                hover
-                sx={{ cursor: "pointer" }}
-                onClick={() => navigate(`${Constants.EDIT_PATH}/${p.id}`)}
-              >
-                <TableCell>{p.id}</TableCell>
-                <TableCell>{p.name}</TableCell>
-                {/* <TableCell>{p.price}</TableCell> */}
-                <TableCell
-                  onClick={(e) => e.stopPropagation()} // 🔥 cực quan trọng
-                >
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    color="error"
-                    onClick={() => handleClear(p.id)}
-                  >
-                    Clear
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Paper>
-    </Container>
-  );
+            {openModal && (
+                <CreateOrEdit member={selectedMember} onClose={handleClose} />
+            )}
+        </div>
+    );
 }

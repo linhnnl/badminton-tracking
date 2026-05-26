@@ -8,12 +8,6 @@ import {
     MenuItem,
     Select,
     Stack,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
     TextField,
     Typography,
 } from '@mui/material';
@@ -26,7 +20,9 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 
 import dayjs from 'dayjs';
 
-import type { Session } from '../Container';
+import CommonTable from '../../../Component/CommonTable.tsx';
+import type { Column } from '../../../Component/CommonTable.tsx';
+import type { Member, Session } from '../Container';
 import { useState } from 'react';
 
 type Props = {
@@ -83,9 +79,53 @@ const memberTableSx = {
     },
 } as const;
 
+const memberColumns: Column<Member>[] = [
+    { field: 'name', headerName: 'Họ và tên', align: 'center' },
+    {
+        field: 'id',
+        headerName: 'Chi phí cố định',
+        align: 'center',
+        render: () => '500,000 đ',
+    },
+    {
+        field: 'checked',
+        headerName: 'Tham gia',
+        align: 'center',
+        render: (row) => (
+            <Checkbox checked={row.checked} size="small" sx={{ p: 0.5 }} />
+        ),
+    },
+    {
+        field: 'paymentType',
+        headerName: 'Chi phí khác',
+        align: 'center',
+        render: () => '0 đ',
+    },
+    {
+        field: 'id',
+        headerName: 'Trạng thái',
+        align: 'center',
+        render: () => (
+            <FormControl fullWidth size="small">
+                <Select
+                    defaultValue="Not"
+                    sx={{
+                        '& .MuiSelect-select': {
+                            textAlign: 'center',
+                        },
+                    }}
+                >
+                    <MenuItem value="Done">Đã thanh toán</MenuItem>
+                    <MenuItem value="Not">Chưa thanh toán</MenuItem>
+                </Select>
+            </FormControl>
+        ),
+    },
+];
+
 export default function Information({ formData }: Props) {
-    //const selectedCount = formData.members.filter((m) => m.checked).length;
     const [selectedMembers, setSelectedMembers] = useState<MemberOption[]>([]);
+
     return (
         <Stack spacing={3}>
             <Box
@@ -210,75 +250,15 @@ export default function Information({ formData }: Props) {
 
                 </Stack>
 
-                <TableContainer
-                    sx={{
-                        border: '1px solid #e5e7eb',
-                        borderRadius: 2,
-                    }}
-                >
-                    <Table size="small" sx={memberTableSx}>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell align="center" sx={memberTableHeadCellSx}>
-                                    Họ và tên
-                                </TableCell>
-                                <TableCell align="center" sx={memberTableHeadCellSx}>
-                                    Chi phí cố định
-                                </TableCell>
-                                <TableCell align="center" sx={memberTableHeadCellSx}>
-                                    Tham gia
-                                </TableCell>
-                                <TableCell align="center" sx={memberTableHeadCellSx}>
-                                    Chi phí khác
-                                </TableCell>
-                                <TableCell align="center" sx={memberTableHeadCellSx}>
-                                    Trạng thái
-                                </TableCell>
-                            </TableRow>
-                        </TableHead>
-
-                        <TableBody>
-                            {formData.members.map((member) => (
-                                <TableRow key={member.id} hover>
-                                    <TableCell align="center" >
-                                        {member.name}
-                                    </TableCell>
-                                    <TableCell align="center" >
-                                        500,000 đ
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        <Checkbox
-                                            checked={member.checked}
-                                            size="small"
-                                            sx={{ p: 0.5 }}
-                                        />
-                                    </TableCell>
-                                    <TableCell align="center" >
-                                        0 đ
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        <FormControl fullWidth size="small">
-                                            <Select
-                                                sx={{
-                                                    '& .MuiSelect-select': {
-                                                        textAlign: 'center',
-                                                    },
-                                                }}
-                                            >
-                                                <MenuItem value="Done">
-                                                    Đã thanh toán
-                                                </MenuItem>
-                                                <MenuItem value="Not">
-                                                    Chưa thanh toán
-                                                </MenuItem>
-                                            </Select>
-                                        </FormControl>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                <CommonTable
+                    columns={memberColumns}
+                    rows={formData.members}
+                    variant="plain"
+                    size="small"
+                    tableSx={memberTableSx}
+                    headCellSx={memberTableHeadCellSx}
+                    getRowKey={(row) => row.id}
+                />
 
             </Box>
 
