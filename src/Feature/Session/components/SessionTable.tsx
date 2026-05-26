@@ -1,3 +1,15 @@
+import {
+    Button,
+    Chip,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+} from '@mui/material';
+
 import type { Session } from '../Container';
 
 type Props = {
@@ -7,49 +19,59 @@ type Props = {
 
 export default function SessionTable({ sessions, onEdit }: Props) {
     return (
-        <div className="card">
-            <table className="session-table">
-                <thead>
-                    <tr>
-                        <th>Ngày</th>
-                        <th>Sân đánh</th>
-                        <th>Loại thanh toán</th>
-                        <th>Người trả tiền</th>
-                        <th>Số người tham gia</th>
-                        <th></th>
-                    </tr>
-                </thead>
+        <TableContainer component={Paper} className="card">
+            <Table>
+                <TableHead>
+                    <TableRow>
+                        <TableCell>ID</TableCell>
+                        <TableCell>Ngày</TableCell>
+                        <TableCell>Sân</TableCell>
+                        <TableCell>Loại thanh toán</TableCell>
+                        <TableCell>Người thanh toán</TableCell>
+                        <TableCell>Số người</TableCell>
+                        <TableCell align="right" />
+                    </TableRow>
+                </TableHead>
 
-                <tbody>
+                <TableBody>
                     {sessions.map((session) => (
-                        <tr key={session.id}>
-                            <td>{session.date}</td>
-                            <td>{session.court}</td>
-                            <td>
-                                <span
-                                    className={`badge ${
+                        <TableRow key={session.id} hover>
+                            <TableCell>{session.id}</TableCell>
+                            <TableCell>{session.date}</TableCell>
+                            <TableCell>{session.court}</TableCell>
+
+                            <TableCell>
+                                <Chip
+                                    label={session.paymentType}
+                                    size="small"
+                                    className={
                                         session.paymentType === 'Monthly'
-                                            ? 'badge-primary'
-                                            : 'badge-warning'
-                                    }`}
-                                >
-                                    {session.paymentType}
-                                </span>
-                            </td>
-                            <td>{session.payer}</td>
-                            <td>{session.members.filter((m) => m.checked).length}</td>
-                            <td className="text-right">
-                                <button
-                                    className="btn btn-outline btn-sm"
+                                            ? 'custom-chip-primary'
+                                            : 'custom-chip-warning'
+                                    }
+                                />
+                            </TableCell>
+
+                            <TableCell>{session.payer}</TableCell>
+
+                            <TableCell>
+                                {session.members.filter((m) => m.checked).length}
+                            </TableCell>
+
+                            <TableCell align="right">
+                                <Button
+                                    variant="outlined"
+                                    size="small"
+                                    className="custom-button custom-button-outline custom-button-sm"
                                     onClick={() => onEdit(session)}
                                 >
-                                    Xem chi tiết
-                                </button>
-                            </td>
-                        </tr>
+                                    Chi tiết
+                                </Button>
+                            </TableCell>
+                        </TableRow>
                     ))}
-                </tbody>
-            </table>
-        </div>
+                </TableBody>
+            </Table>
+        </TableContainer>
     );
 }

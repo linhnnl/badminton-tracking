@@ -52,3 +52,6 @@
     align-items: center;
     margin-bottom: 28px;
 }
+.page-title {
+    color: var(--text-primary);
+}

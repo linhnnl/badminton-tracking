@@ -1,6 +1,7 @@
 /* CARD */
 .card {
     background: white;
+    color: var(--text-primary);
     border-radius: var(--radius-md);
     padding: 20px;
     box-shadow: var(--shadow-sm);
@@ -15,6 +16,7 @@
 .card-value {
     font-size: 32px;
     font-weight: 700;
+    color: var(--text-primary);
 }
 
 /* DASHBOARD GRID */
@@ -25,22 +27,29 @@
 }
 
 /* BUTTON */
-.btn {
-    border: none;
-    outline: none;
-    padding: 12px 20px;
+.btn,
+.custom-button.MuiButton-root {
     border-radius: 12px;
     font-weight: 600;
     cursor: pointer;
     transition: var(--transition);
+    text-transform: none;
 }
 
-.btn-primary {
+.btn {
+    border: none;
+    outline: none;
+    padding: 12px 20px;
+}
+
+.btn-primary,
+.custom-button-primary.MuiButton-root {
     background: var(--primary);
     color: white;
 }
 
-.btn-primary:hover {
+.btn-primary:hover,
+.custom-button-primary.MuiButton-root:hover {
     background: var(--primary-hover);
 }
 
@@ -49,9 +58,22 @@
     color: #222;
 }
 
-.btn-outline {
+.btn-outline,
+.custom-button-outline.MuiButton-root {
     border: 1px solid var(--border-color);
     background: white;
+    color: var(--text-primary);
+}
+
+.btn-outline:hover,
+.custom-button-outline.MuiButton-root:hover {
+    background: #f8fafc;
+}
+
+.btn-sm,
+.custom-button-sm.MuiButton-root {
+    padding: 8px 12px;
+    font-size: 13px;
 }
 
 /* INPUT */
@@ -64,6 +86,7 @@
 .form-label {
     font-size: 14px;
     font-weight: 600;
+    color: var(--text-primary);
 }
 
 .input {
@@ -73,12 +96,39 @@
     padding: 0 14px;
     outline: none;
     transition: var(--transition);
+    color: var(--text-primary);
+    background: white;
 }
 
 .input:focus {
     border-color: var(--primary);
 }
 
+/* MUI INPUT */
+.custom-input .MuiOutlinedInput-root {
+    border-radius: 10px;
+    background: white;
+}
+
+.custom-input .MuiOutlinedInput-input {
+    color: var(--text-primary);
+}
+
+.custom-input .MuiInputLabel-root {
+    color: var(--text-secondary);
+}
+
+.custom-input .MuiOutlinedInput-notchedOutline {
+    border-color: var(--border-color);
+}
+
+.custom-input .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+    border-color: var(--primary);
+}
+
+.custom-input .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: var(--primary);
+}
 
 /* MODAL */
 .modal-overlay {
@@ -93,11 +143,13 @@
     z-index: 1000;
 }
 
-.modal {
+.modal,
+.custom-dialog .MuiPaper-root {
     width: 800px;
     max-width: 90vw;
 
     background: white;
+    color: var(--text-primary);
     border-radius: 20px;
 
     overflow: hidden;
@@ -105,7 +157,8 @@
     box-shadow: var(--shadow-md);
 }
 
-.modal-header {
+.modal-header,
+.custom-dialog-title {
     background: var(--primary);
     color: white;
 
@@ -116,18 +169,19 @@
     align-items: center;
 }
 
-.modal-body {
+.modal-body,
+.custom-dialog-content {
     padding: 24px;
 }
 
-.modal-footer {
+.modal-footer,
+.custom-dialog-actions {
     padding: 20px 24px;
 
     display: flex;
     justify-content: flex-end;
     gap: 12px;
 }
-
 
 /* MEMBER LIST */
 .member-list {
@@ -140,7 +194,8 @@
     padding: 12px;
 }
 
-.member-item {
+.member-item,
+.custom-member-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -151,7 +206,8 @@
     transition: var(--transition);
 }
 
-.member-item:hover {
+.member-item:hover,
+.custom-member-item:hover {
     background: #f8fafc;
 }
 
@@ -161,7 +217,8 @@
     gap: 12px;
 }
 
-.avatar {
+.avatar,
+.custom-avatar.MuiAvatar-root {
     width: 36px;
     height: 36px;
 
@@ -177,7 +234,6 @@
     color: var(--primary);
 }
 
-
 /* BADGE */
 .badge {
     padding: 4px 10px;
@@ -186,17 +242,28 @@
     font-weight: 600;
 }
 
-.badge-primary {
+.badge-primary,
+.custom-chip-primary.MuiChip-root {
     background: #e0edff;
     color: var(--primary);
 }
 
-.badge-warning {
+.badge-warning,
+.custom-chip-warning.MuiChip-root {
     background: #fff4d6;
     color: #ff9900;
 }
 
-/**/
+/* TEXT */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--text-primary);
+}
+
 .text-secondary {
     color: var(--text-secondary);
     margin-top: 4px;
@@ -204,11 +271,6 @@
 
 .text-right {
     text-align: right;
-}
-
-.btn-sm {
-    padding: 8px 12px;
-    font-size: 13px;
 }
 
 .session-table {
@@ -229,6 +291,7 @@
     padding: 16px;
     border-bottom: 1px solid var(--border-color);
     font-size: 14px;
+    color: var(--text-primary);
 }
 
 .session-table tr:hover td {
@@ -266,5 +329,10 @@
 
     .card {
         overflow-x: auto;
+    }
+
+    .modal,
+    .custom-dialog .MuiPaper-root {
+        width: 95vw;
     }
 }

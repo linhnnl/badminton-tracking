@@ -2,7 +2,7 @@ import { useState } from 'react';
 import CreateOrEdit from './CreateOrEdit';
 import SessionTable from './components/SessionTable';
 
-export type PaymentType = 'Monthly' | 'Single';
+export type PaymentType = 'Monthly' | 'Single'|'No';
 
 export type Member = {
     id: number;
@@ -30,7 +30,7 @@ const fakeSessions: Session[] = [
         members: [
             { id: 1, name: 'Nguyễn Văn An', paymentType: 'Monthly', checked: true },
             { id: 2, name: 'Trần Thị Bình', paymentType: 'Monthly', checked: true },
-            { id: 3, name: 'Lê Minh Cường', paymentType: 'Single', checked: false },
+            { id: 3, name: 'Lê Minh Cường', paymentType: 'No', checked: false },
             { id: 4, name: 'Phạm Thị Dung', paymentType: 'Monthly', checked: true },
         ],
     },
@@ -70,15 +70,9 @@ export default function Container() {
     return (
         <div>
             <div className="page-header">
-                <div>
-                    <h1>Danh sách buổi đánh</h1>
-                    <p className="text-secondary">
-                        Quản lý các buổi chơi cầu lông của câu lạc bộ.
-                    </p>
-                </div>
-
+                <h2 className="page-title">List Session</h2>
                 <button className="btn btn-primary" onClick={handleCreate}>
-                    + Tạo buổi đánh
+                    Add Session
                 </button>
             </div>
 
