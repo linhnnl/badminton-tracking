@@ -6,36 +6,28 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
-    MenuItem,
     TextField,
     Typography,
 } from '@mui/material';
 
-import type { Member } from '../../Common/mockdata';
+import type { Court } from '../../Common/mockdata';
 
 type Props = {
-    member: Member | null;
+    court: Court | null;
     onClose: () => void;
 };
 
-const defaultMember: Member = {
+const defaultCourt: Court = {
     id: 0,
-    username: '',
-    password: '',
     name: '',
-    status: 'Active',
+    address: '',
 };
 
-const statusOptions = [
-    { id: 'Active', name: 'Active' },
-    { id: 'Inactive', name: 'Inactive' },
-] as const;
+export default function CreateOrEdit({ court, onClose }: Props) {
+    const isEdit = Boolean(court);
+    const [form, setForm] = useState<Court>(court ?? defaultCourt);
 
-export default function CreateOrEdit({ member, onClose }: Props) {
-    const isEdit = Boolean(member);
-    const [form, setForm] = useState<Member>(member ?? defaultMember);
-
-    const handleChange = <K extends keyof Member>(field: K, value: Member[K]) => {
+    const handleChange = <K extends keyof Court>(field: K, value: Court[K]) => {
         setForm((prev) => ({
             ...prev,
             [field]: value,
@@ -45,12 +37,12 @@ export default function CreateOrEdit({ member, onClose }: Props) {
     const handleSubmit = async () => {
         const payload = {
             name: form.name,
-            status: form.status,
+            //status: form.status,
         };
 
         try {
-            if (isEdit && member) {
-                await axios.put(`/api/members/${member.id}`, payload);
+            if (isEdit && court) {
+                await axios.put(`/api/members/${court.id}`, payload);
             } else {
                 await axios.post('/api/members', payload);
             }
@@ -100,7 +92,7 @@ export default function CreateOrEdit({ member, onClose }: Props) {
                         size="small"
                         margin="normal"
                         value={form.name}
-                        onChange={(e) => handleChange('username', e.target.value)}
+                        onChange={(e) => handleChange('name', e.target.value)}
                     />
                     <TextField
                         label="Password"
@@ -108,38 +100,9 @@ export default function CreateOrEdit({ member, onClose }: Props) {
                         fullWidth
                         size="small"
                         margin="normal"
-                        value={form.name}
-                        onChange={(e) => handleChange('password', e.target.value)}
+                        value={form.address}
+                        onChange={(e) => handleChange('address', e.target.value)}
                     />
-                    <TextField
-                        label="Tên"
-                        fullWidth
-                        size="small"
-                        margin="normal"
-                        value={form.name}
-                        onChange={(e) => handleChange('name', e.target.value)}
-                    />
-
-                    <TextField
-                        select
-                        label="Trạng thái"
-                        fullWidth
-                        size="small"
-                        margin="normal"
-                        value={form.status}
-                        onChange={(e) =>
-                            handleChange(
-                                'status',
-                                e.target.value as Member['status'],
-                            )
-                        }
-                    >
-                        {statusOptions.map((option) => (
-                            <MenuItem key={option.id} value={option.id}>
-                                {option.name}
-                            </MenuItem>
-                        ))}
-                    </TextField>
                 </Box>
             </DialogContent>
 

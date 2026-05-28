@@ -1,38 +1,64 @@
 import { useState } from 'react';
-
-import CommonTable, { renderChip } from '../../Component/CommonTable.tsx';
-import type { Column, TableAction } from '../../Component/CommonTable.tsx';
-import type { Member } from '../../types';
 import CreateOrEdit from './CreateOrEdit';
-
-const fakeMembers: Member[] = [
-    { id: 1, name: 'Nguyễn Văn An', status: 'active' },
-    { id: 2, name: 'Trần Thị Bình', status: 'active' },
-    { id: 3, name: 'Lê Minh Cường', status: 'inactive' },
-    { id: 4, name: 'Phạm Thị Dung', status: 'active' },
-];
-
-const columns: Column<Member>[] = [
-    { field: 'id', headerName: 'ID'},
-    { field: 'name', headerName: 'Tên'},
-    {
-        field: 'status',
-        headerName: 'Trạng thái',
-        render: renderChip<Member>('status', {
-            getLabel: (value) => (value === 'active' ? 'Active' : 'Inactive'),
-            getClassName: (value) =>
-                value === 'active'
-                    ? 'custom-chip-primary'
-                    : 'custom-chip-warning',
-        }),
-    },
-];
+import { mockMembers, type Member, type MemberDto } from '../../Common/mockdata.ts';
+import CommonDataGrid from '../../Component/CommonDataGrid/index.tsx';
+import EditIcon from '@mui/icons-material/Edit';
+import type { GridColDef } from '@mui/x-data-grid';
+import { Chip, IconButton } from '@mui/material';
 
 export default function MemberContainer() {
-    const [members] = useState<Member[]>(fakeMembers);
+    const [members] = useState<Member[]>(mockMembers);
     const [selectedMember, setSelectedMember] = useState<Member | null>(null);
     const [openModal, setOpenModal] = useState(false);
-
+    const columns: GridColDef<MemberDto>[] = [
+        {
+            field: 'id', 
+            headerName: 'ID', 
+            flex: 0.2,
+            valueGetter: (_,row) => row.id,
+        },
+        {
+            field: 'username',
+            headerName: 'Username',
+            flex: 0.5,
+            valueGetter: (_,row) => row.username,
+        },
+        {
+            field: 'name',
+            headerName: 'Tên',
+            flex: 0.5,
+            valueGetter: (_,row) => row.name,
+        },
+        {
+            field: 'status',
+            headerName: 'Trạng thái',
+            flex: 0.5,
+            renderCell: (params) => (
+                <Chip
+                    label={params.row.status}
+                    className={
+                        params.row.status === 'Active'
+                            ? 'custom-chip-primary'
+                            : 'custom-chip-warning'
+                    }
+                    size="small"
+                />
+            ),
+        },
+        {
+            field: 'actions',
+            headerName: '',
+            flex: 0.2,
+            renderCell: (params) => (
+                <IconButton
+                    color="primary"
+                    onClick={() => handleEdit(params.row)}
+                >
+                    <EditIcon fontSize="small"/>
+                </IconButton>
+            ),
+        }   
+    ];
     const handleCreate = () => {
         setSelectedMember(null);
         setOpenModal(true);
@@ -48,13 +74,6 @@ export default function MemberContainer() {
         setSelectedMember(null);
     };
 
-    const actions: TableAction<Member>[] = [
-        {
-            label: 'Chi tiết',
-            onClick: handleEdit,
-        },
-    ];
-
     return (
         <div>
             <div className="page-header">
@@ -64,7 +83,10 @@ export default function MemberContainer() {
                 </button>
             </div>
 
-            <CommonTable columns={columns} rows={members} actions={actions} />
+            <CommonDataGrid
+                rows={members}
+                columns={columns}
+            />
 
             {openModal && (
                 <CreateOrEdit member={selectedMember} onClose={handleClose} />

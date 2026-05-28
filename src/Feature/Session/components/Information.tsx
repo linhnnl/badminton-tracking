@@ -11,6 +11,8 @@ import {
     TextField,
     Typography,
 } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
+import type { GridColDef } from '@mui/x-data-grid';
 
 import AddIcon from '@mui/icons-material/Add';
 
@@ -20,112 +22,81 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 
 import dayjs from 'dayjs';
 
-import CommonTable from '../../../Component/CommonTable.tsx';
-import type { Column } from '../../../Component/CommonTable.tsx';
-import type { Member, Session } from '../Container';
 import { useState } from 'react';
+import { mockCourts, mockMembers, type MemberDto, type SessionDto, type SessionMemberDto } from '../../../Common/mockdata.ts';
 
 type Props = {
-    formData: Session;
+    formData: SessionDto;
 };
 
-export type MemberOption = {
-    id: number;
-    name: string;
-    avatar?: string;
+const commonColumn: Partial<GridColDef> = {
+    headerAlign: 'center',
+    align: 'center',
+    flex: 1,
 };
 
-export const memberOptions: MemberOption[] = [
-    {
-        id: 1,
-        name: 'Nguyễn Văn An',
+const columns: GridColDef<SessionMemberDto>[] = [
+    { 
+        ...commonColumn,
+        field: 'member', 
+        headerName: 'Họ và tên', 
+        valueGetter: (_,row) => row.member?.name,
     },
     {
-        id: 2,
-        name: 'Trần Thị Bình',
-    },
-    {
-        id: 3,
-        name: 'Lê Minh Cường',
-    },
-    {
-        id: 4,
-        name: 'Phạm Thị Dung',
-    },
-    {
-        id: 5,
-        name: 'Hoàng Gia Huy',
-    },
-    {
-        id: 6,
-        name: 'Đỗ Minh Khôi',
-    },
-];
-
-const memberTableHeadCellSx = {
-    fontWeight: 700,
-    fontSize: 13,
-    bgcolor: '#f1f5f9',
-    borderBottom: '1px solid #e5e7eb',
-} as const;
-
-const memberTableSx = {
-    tableLayout: 'fixed',
-    width: '100%',
-    '& .MuiTableCell-root': {
-        px: 2,
-        py: 1.25,
-        textAlign: 'center',
-    },
-} as const;
-
-const memberColumns: Column<Member>[] = [
-    { field: 'name', headerName: 'Họ và tên', align: 'center' },
-    {
-        field: 'id',
+        ...commonColumn,
+        field: 'fixedCost',
         headerName: 'Chi phí cố định',
-        align: 'center',
-        render: () => '500,000 đ',
+        valueGetter: (_,row) => row.fixedCost,
     },
     {
-        field: 'checked',
+        ...commonColumn,
+        field: 'isAttend',
         headerName: 'Tham gia',
-        align: 'center',
-        render: (row) => (
-            <Checkbox checked={row.checked} size="small" sx={{ p: 0.5 }} />
+        renderCell: (params) => (
+            <Checkbox
+                checked={!!params.row.isAttend}
+                size="small"
+                sx={{ p: 0.5 }}
+            />
         ),
     },
     {
-        field: 'paymentType',
+        ...commonColumn,
+        field: 'type',
         headerName: 'Chi phí khác',
-        align: 'center',
-        render: () => '0 đ',
+        valueGetter: (_,row) => row.extraCost,
     },
     {
-        field: 'id',
+        ...commonColumn,
+        field: 'paymentStatus',
         headerName: 'Trạng thái',
-        align: 'center',
-        render: () => (
+        //width: 180,
+        renderCell: (params) => (
             <FormControl fullWidth size="small">
                 <Select
-                    defaultValue="Not"
+                    value={params.row.paymentStatus}
                     sx={{
                         '& .MuiSelect-select': {
                             textAlign: 'center',
                         },
                     }}
                 >
-                    <MenuItem value="Done">Đã thanh toán</MenuItem>
-                    <MenuItem value="Not">Chưa thanh toán</MenuItem>
+                    <MenuItem value="Paid">
+                        Đã thanh toán
+                    </MenuItem>
+    
+                    <MenuItem value="Unpaid">
+                        Chưa thanh toán
+                    </MenuItem>
                 </Select>
             </FormControl>
         ),
-    },
+    }
 ];
 
 export default function Information({ formData }: Props) {
-    const [selectedMembers, setSelectedMembers] = useState<MemberOption[]>([]);
-
+    const [selectedMembers, setSelectedMembers] = useState<MemberDto[]>([]);
+    console.log('formData',formData)
     return (
         <Stack spacing={3}>
             <Box
@@ -145,6 +116,18 @@ export default function Information({ formData }: Props) {
                     gridTemplateColumns="repeat(3, 1fr)"
                     gap={2}
                 >
+                    <FormControl fullWidth size="small">
+                        <InputLabel>Loại thanh toán</InputLabel>
+
+                        <Select
+                            value={formData.paymentType}
+                            label="Loại thanh toán"
+                        >
+                            <MenuItem value="Monthly">Monthly</MenuItem>
+                            <MenuItem value="Single">Single</MenuItem>
+                        </Select>
+                    </FormControl>
+
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DateTimePicker
                             label="Thời gian"
@@ -156,11 +139,12 @@ export default function Information({ formData }: Props) {
                                     size: 'small',
                                 },
                             }}
+                            
                         />
                     </LocalizationProvider>
 
                     <FormControl fullWidth size="small">
-                        <InputLabel>Sân</InputLabel>
+                        {/* <InputLabel>Sân</InputLabel>
 
                         <Select value={formData.court} label="Sân">
                             <MenuItem value="">Chọn sân</MenuItem>
@@ -170,19 +154,27 @@ export default function Information({ formData }: Props) {
                             <MenuItem value="Sân A - Phú Nhuận">
                                 Sân A - Phú Nhuận
                             </MenuItem>
-                        </Select>
-                    </FormControl>
+                        </Select> */}
 
-                    <FormControl fullWidth size="small">
-                        <InputLabel>Loại thanh toán</InputLabel>
-
-                        <Select
-                            value={formData.paymentType}
-                            label="Loại thanh toán"
-                        >
-                            <MenuItem value="Monthly">Monthly</MenuItem>
-                            <MenuItem value="Single">Single</MenuItem>
-                        </Select>
+                        <Autocomplete
+                            fullWidth
+                            options={mockCourts}
+                            value={formData.court}
+                            // onChange={(_, value) =>
+                            //     updateItem(item.id, { payer: value })
+                            // }
+                            getOptionLabel={(option) => option.name}
+                            isOptionEqualToValue={(option, value) =>
+                                option.id === value.id
+                            }
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    size="small"
+                                    placeholder="Tìm theo tên"
+                                />
+                            )}
+                        />
                     </FormControl>
                 </Box>
             </Box>
@@ -216,7 +208,7 @@ export default function Information({ formData }: Props) {
                         <Autocomplete
                             multiple
                             fullWidth
-                            options={memberOptions}
+                            options={mockMembers}
                             value={selectedMembers}
                             onChange={(_, value) => setSelectedMembers(value)}
                             getOptionLabel={(option) => option.name}
@@ -250,14 +242,28 @@ export default function Information({ formData }: Props) {
 
                 </Stack>
 
-                <CommonTable
-                    columns={memberColumns}
+                <DataGrid
                     rows={formData.members}
-                    variant="plain"
-                    size="small"
-                    tableSx={memberTableSx}
-                    headCellSx={memberTableHeadCellSx}
-                    getRowKey={(row) => row.id}
+                    columns={columns}
+                    initialState={{
+                        pagination: {
+                            paginationModel: {
+                                pageSize: 5,
+                            },
+                        },
+                    }}
+                    sx={{
+                        '& .MuiDataGrid-columnHeader': {
+                            bgcolor: '#f1f5f9',
+                        },
+                
+                        '& .MuiDataGrid-columnHeaderTitle': {
+                            fontWeight: 700,
+                        },
+                    }}
+                    pageSizeOptions={[5]}
+                    disableRowSelectionOnClick
+                    disableColumnResize
                 />
 
             </Box>
@@ -291,7 +297,7 @@ export default function Information({ formData }: Props) {
                         <Autocomplete
                             multiple
                             fullWidth
-                            options={memberOptions}
+                            options={mockMembers}
                             value={selectedMembers}
                             onChange={(_, value) => setSelectedMembers(value)}
                             getOptionLabel={(option) => option.name}
@@ -334,7 +340,29 @@ export default function Information({ formData }: Props) {
                         bgcolor: '#f8fafc',
                     }}
                 >
-                    Chưa có khách vãng lai
+                    <DataGrid
+                        rows={formData.members}
+                        columns={columns}
+                        initialState={{
+                            pagination: {
+                                paginationModel: {
+                                    pageSize: 5,
+                                },
+                            },
+                        }}
+                        sx={{
+                            '& .MuiDataGrid-columnHeader': {
+                                bgcolor: '#f1f5f9',
+                            },
+                    
+                            '& .MuiDataGrid-columnHeaderTitle': {
+                                fontWeight: 700,
+                            },
+                        }}
+                        pageSizeOptions={[5]}
+                        disableRowSelectionOnClick
+                        disableColumnResize
+                    />
                 </Box>
             </Box>
         </Stack>

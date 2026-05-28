@@ -1,8 +1,11 @@
 import { useState } from 'react';
-
-import CommonTable, { renderChip } from '../../Component/CommonTable.tsx';
-import type { Column, TableAction } from '../../Component/CommonTable.tsx';
 import CreateOrEdit from './CreateOrEdit';
+import { mockSessions, type SessionDto } from '../../Common/mockdata.ts';
+import type { GridColDef } from '@mui/x-data-grid';
+import { Chip, IconButton } from '@mui/material';
+import dayjs from 'dayjs';
+import EditIcon from '@mui/icons-material/Edit';
+import CommonDataGrid from '../../Component/CommonDataGrid/Container.tsx';
 
 export type PaymentType = 'Monthly' | 'Single' | 'No';
 
@@ -22,59 +25,9 @@ export type Session = {
     members: Member[];
 };
 
-const fakeSessions: Session[] = [
-    {
-        id: 1,
-        date: '04/01/2026',
-        court: 'Sân E - Tân Bình',
-        paymentType: 'Monthly',
-        payer: 'Trần Thị Bình',
-        members: [
-            { id: 1, name: 'Nguyễn Văn An', paymentType: 'Monthly', checked: true },
-            { id: 2, name: 'Trần Thị Bình', paymentType: 'Monthly', checked: true },
-            { id: 3, name: 'Lê Minh Cường', paymentType: 'No', checked: false },
-            { id: 4, name: 'Phạm Thị Dung', paymentType: 'Monthly', checked: true },
-        ],
-    },
-    {
-        id: 2,
-        date: '04/08/2026',
-        court: 'Sân A - Phú Nhuận',
-        paymentType: 'Single',
-        payer: 'Nguyễn Văn An',
-        members: [
-            { id: 1, name: 'Nguyễn Văn An', paymentType: 'Single', checked: true },
-            { id: 2, name: 'Trần Thị Bình', paymentType: 'Monthly', checked: true },
-        ],
-    },
-];
-
-const columns: Column<Session>[] = [
-    { field: 'id', headerName: 'ID' },
-    { field: 'date', headerName: 'Ngày' },
-    { field: 'court', headerName: 'Sân' },
-    {
-        field: 'paymentType',
-        headerName: 'Loại thanh toán',
-        render: renderChip<Session>('paymentType', {
-            getLabel: (value) => String(value),
-            getClassName: (value) =>
-                value === 'Monthly'
-                    ? 'custom-chip-primary'
-                    : 'custom-chip-warning',
-        }),
-    },
-    { field: 'payer', headerName: 'Người thanh toán' },
-    {
-        field: 'members',
-        headerName: 'Số người',
-        render: (row) => row.members.filter((m) => m.checked).length,
-    },
-];
-
 export default function Container() {
-    const [sessions] = useState<Session[]>(fakeSessions);
-    const [selectedSession, setSelectedSession] = useState<Session | null>(null);
+    const [sessions] = useState<SessionDto[]>(mockSessions);
+    const [selectedSession, setSelectedSession] = useState<SessionDto | null>(null);
     const [openModal, setOpenModal] = useState(false);
 
     const handleCreate = () => {
@@ -82,7 +35,7 @@ export default function Container() {
         setOpenModal(true);
     };
 
-    const handleEdit = (session: Session) => {
+    const handleEdit = (session: SessionDto) => {
         setSelectedSession(session);
         setOpenModal(true);
     };
@@ -92,11 +45,60 @@ export default function Container() {
         setSelectedSession(null);
     };
 
-    const actions: TableAction<Session>[] = [
+    const columns: GridColDef<SessionDto>[] = [
         {
-            label: 'Chi tiết',
-            onClick: handleEdit,
+            field: 'id', 
+            headerName: 'ID', 
+            flex: 0.2,
+            valueGetter: (_,row) => row.id,
         },
+        {
+            field: 'date',
+            headerName: 'Ngày',
+            flex: 0.5,
+            valueGetter: (_,row) => dayjs(row.date).format('H:mm DD/MM/YYYY'),
+        },
+        {
+            field: 'court',
+            headerName: 'Sân',
+            flex: 0.5,
+            valueGetter: (_,row) => row.court?.name,
+        },
+        {
+            field: 'paymentType',
+            headerName: 'Loại thanh toán',
+            flex: 0.5,
+            renderCell: (params) => (
+                <Chip
+                    label={params.row.paymentType}
+                    className={
+                        params.row.paymentType === 'Monthly'
+                            ? 'custom-chip-primary'
+                            : 'custom-chip-warning'
+                    }
+                    size="small"
+                />
+            ),
+        },
+        {
+            field: 'members',
+            headerName: 'Số người',
+            flex: 0.5,
+            valueGetter: (_,row) => row.members.filter((m) => m.isAttend).length,
+        },
+        {
+            field: 'actions',
+            headerName: '',
+            flex: 0.2,
+            renderCell: (params) => (
+                <IconButton
+                    color="primary"
+                    onClick={() => handleEdit(params.row)}
+                >
+                    <EditIcon fontSize="small"/>
+                </IconButton>
+            ),
+        }   
     ];
 
     return (
@@ -108,8 +110,10 @@ export default function Container() {
                 </button>
             </div>
 
-            <CommonTable columns={columns} rows={sessions} actions={actions} />
-
+            <CommonDataGrid
+                rows={sessions}
+                columns={columns}
+            />
             {openModal && (
                 <CreateOrEdit
                     session={selectedSession}

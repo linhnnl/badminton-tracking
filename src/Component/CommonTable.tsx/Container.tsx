@@ -52,8 +52,12 @@ export default function TableContainer<T>({
                         {columns.map((column) => (
                             <TableCell
                                 key={columnKey(column)}
-                                align={column.align}
-                                sx={{ width: column.width, ...headCellSx }}
+                                align={column.align ?? 'center'}
+                                sx={{ 
+                                    width: column.width, 
+                                    fontWeight: 600,
+                                    ...headCellSx 
+                                }}
                             >
                                 {column.headerName}
                             </TableCell>
@@ -74,7 +78,7 @@ export default function TableContainer<T>({
                             {columns.map((column) => (
                                 <TableCell
                                     key={columnKey(column)}
-                                    align={column.align}
+                                    align={column.align ?? 'center'}
                                 >
                                     {renderCell(column, row)}
                                 </TableCell>

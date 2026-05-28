@@ -63,6 +63,8 @@ export function renderTextField<T>(
 
 export function renderCell<T>(column: Column<T>, row: T) {
     if (column.render) {
+        const x = column.render(row);
+        console.log('x',x)
         return column.render(row);
     }
 

@@ -13,6 +13,11 @@ export const menu: MenuItem[] = [
         icon: "home",
     },
     {
+        label: "Court",
+        path: "courts",
+        icon: "courts",
+    },
+    {
         label: "Members",
         icon: "members",
         path: "members",
@@ -21,11 +26,5 @@ export const menu: MenuItem[] = [
         label: "Sessions",
         icon: "sessions",
         path: "sessions",
-    },
-    {
-        label: "Payments",
-        icon: "payments",
-        path: "payments",
-
     },
 ];
